@@ -5,7 +5,7 @@ const app = express()
 const port = process.env.PORT || 5000
 require('dotenv').config()
 //middleware
-app.use(express())
+app.use(express.json())
 app.use(cors())
 
 
@@ -24,7 +24,12 @@ async function run() {
         await client.connect();
         // Send a ping to confirm a successful connection
         const newBrandDB = client.db('BrandDB').collection('Brand')
-        
+        app.post('/product', async (req, res) => {
+            const product = req.body;
+            const result = await newBrandDB.insertOne(product)
+            console.log(result)
+            res.send(result)
+        })
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
