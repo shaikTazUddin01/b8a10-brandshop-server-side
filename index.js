@@ -35,27 +35,73 @@ async function run() {
             res.send(cursor)
         })
 
+        // app.get('/products/:brand', async (req, res) => {
+        //     const brandItem = req.params.brand
+        //     const query = { brandName: brandItem }
+        //     const filterProduct = await newBrandDB.find(query).toArray();
+        //     res.send(filterProduct);
+
+        // })
+
+        // app.get('/products/:id', async (req, res) => {
+        //     const currnetId = req.params.id
+        //     const query = { _id: new ObjectId(currnetId) };
+        //     const result = await newBrandDB.findOne(query);
+        //     res.send(result)
+        // })
+
+        app.get('/products', async (req, res) => {
+            const cursor = await newBrandDB.find().toArray();
+            res.send(cursor);
+        });
+
 
         app.get('/products/:id', async (req, res) => {
-            const id = req.params.id
+            const id = req.params.id;
+            const result = await newBrandDB.findOne({ _id: new ObjectId(id) });
+            res.send(result);
             console.log(id)
-            const query = { _id: new ObjectId(id) };
-            const result = await newBrandDB.findOne(query);
-            res.send(result)
+            console.log(result)
+        });
+
+
+        app.get('/products1/:brand', async (req, res) => {
+            const brandItem = req.params.brand;
+            console.log(brandItem)
+            const query = { brandName: brandItem };
             console.log(query)
-        })
-
-
-        app.get('/products/:brand', async (req, res) => {
-            const brandItem = req.params.brand
-            const query = { brandName: brandItem }
             const filterProduct = await newBrandDB.find(query).toArray();
             res.send(filterProduct);
-           
-        })
-      
+            console.log(filterProduct)
+        });
 
-       
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const data=req.body
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            // Specify the update to set a value for the plot field
+            const updateProduct = {
+                $set: {
+                    name: data.name,
+                    brandName: data.brandName,
+                    typeOfProduct: data.typeOfProduct,
+                    imageUrl: data.imageUrl,
+                    price: data.price,
+                    rating: data.rating,
+                    shortDescription: data.shortDescription
+                },
+            };
+            const result = await newBrandDB.updateOne(
+                filter,
+                updateProduct,
+                options
+              );
+              res.send(result);
+        })
+
+
+
 
 
         await client.db("admin").command({ ping: 1 });
