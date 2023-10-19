@@ -22,8 +22,9 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-        // Send a ping to confirm a successful connection
+        // create connection dataBase and collection;
         const newBrandDB = client.db('BrandDB').collection('Brand')
+        const OrderDB = client.db('BrandDB').collection('Order')
         app.post('/products', async (req, res) => {
             const product = req.body;
             const result = await newBrandDB.insertOne(product)
@@ -34,21 +35,6 @@ async function run() {
             const cursor = await newBrandDB.find().toArray()
             res.send(cursor)
         })
-
-        // app.get('/products/:brand', async (req, res) => {
-        //     const brandItem = req.params.brand
-        //     const query = { brandName: brandItem }
-        //     const filterProduct = await newBrandDB.find(query).toArray();
-        //     res.send(filterProduct);
-
-        // })
-
-        // app.get('/products/:id', async (req, res) => {
-        //     const currnetId = req.params.id
-        //     const query = { _id: new ObjectId(currnetId) };
-        //     const result = await newBrandDB.findOne(query);
-        //     res.send(result)
-        // })
 
         app.get('/products', async (req, res) => {
             const cursor = await newBrandDB.find().toArray();
@@ -77,7 +63,7 @@ async function run() {
 
         app.put('/products/:id', async (req, res) => {
             const id = req.params.id;
-            const data=req.body
+            const data = req.body
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
             // Specify the update to set a value for the plot field
@@ -96,12 +82,20 @@ async function run() {
                 filter,
                 updateProduct,
                 options
-              );
-              res.send(result);
+            );
+            res.send(result);
         })
 
 
-
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const result = await OrderDB.insertOne(order)
+            res.send(result)
+        })
+        app.get('/order', async (req, res) => {
+            const cursor = await OrderDB.find().toArray();
+            res.send(cursor);
+        })
 
 
         await client.db("admin").command({ ping: 1 });
