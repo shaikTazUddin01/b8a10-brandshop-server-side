@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
 require('dotenv').config()
@@ -24,12 +24,40 @@ async function run() {
         await client.connect();
         // Send a ping to confirm a successful connection
         const newBrandDB = client.db('BrandDB').collection('Brand')
-        app.post('/product', async (req, res) => {
+        app.post('/products', async (req, res) => {
             const product = req.body;
             const result = await newBrandDB.insertOne(product)
             console.log(result)
             res.send(result)
         })
+        app.get('/products', async (req, res) => {
+            const cursor = await newBrandDB.find().toArray()
+            res.send(cursor)
+        })
+
+
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id)
+            const query = { _id: new ObjectId(id) };
+            const result = await newBrandDB.findOne(query);
+            res.send(result)
+            console.log(query)
+        })
+
+
+        app.get('/products/:brand', async (req, res) => {
+            const brandItem = req.params.brand
+            const query = { brandName: brandItem }
+            const filterProduct = await newBrandDB.find(query).toArray();
+            res.send(filterProduct);
+           
+        })
+      
+
+       
+
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
