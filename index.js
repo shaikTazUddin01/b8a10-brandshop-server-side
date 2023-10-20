@@ -75,7 +75,7 @@ async function run() {
                     imageUrl: data.imageUrl,
                     price: data.price,
                     rating: data.rating,
-                    shortDescription: data.shortDescription
+                    // shortDescription: data.shortDescription
                 },
             };
             const result = await newBrandDB.updateOne(
